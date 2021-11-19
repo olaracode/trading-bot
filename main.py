@@ -46,14 +46,28 @@ async def on_message(message):
     else:
       await message.channel.send("There's something going on :sweat_smile: Please try again later")
 
+  #List vs_currency
+  if msg.startswith("$list"):
+  
+    vs_currencies = cg.get_supported_vs_currencies()
+    vs_message = ""
+    #loop thru the vs_currencies array and add the currency to the vs_message string
+    for currency in vs_currencies:
+      #if the currency is the last item on the array the string template change
+      if currency == vs_currencies[-1]:
+        vs_message += "***{}***".format(currency)
+      else:
+        vs_message += "***{}*** - ".format(currency)
+    await message.channel.send("The VS_currency is the way we call the token/coin/currency with which we compare the coin of your choice. This are the ones we support\n {}".format(vs_message))
+
   #get pair price
   if msg.startswith("$vs"):
     try: #Check if the message has more than one word
       value = msg.split("$vs ", 1)[1]
+      # Spread the value.split into two different variables
       [token, vs_currencies] = value.split()
       try:
         price = get_coin(ids=token, vs_currencies=vs_currencies)
-        print(price)
         await message.channel.send("Current {} price is {} {}".format(token, price, vs_currencies))
       except:
         await message.channel.send("There was a problem getting the pair price :face_with_spiral_eyes: Verify the availability and spelling of the coin id you used.\nTo see a coin id reffer to coingecko.com and look for the coin or use **$get_id + token_contract**")
@@ -73,6 +87,7 @@ async def on_message(message):
         await message.channel.send("There has been a problem fetching the servers favourites :skull: Try: \n-Check your internet conection :white_check_mark:  \n-Use **$status** to check the coingecko API status :white_check_mark: \n-Try again")   
     except:
       await message.channel.send("Make sure to include the currency pair :sweat_smile: Eg: \n\n$fav usd :+1:\n \n$fav :x:")
+      
   #Turn on or of
   if msg.startswith("$trady"):
     value = msg.split("$trady ", 1)[1]
