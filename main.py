@@ -37,9 +37,14 @@ async def on_message(message):
     return
 
   msg = message.content
+
   #Get status of the cg API
   if msg.startswith("$status"):
-    print(cg.ping())
+    result = cg.ping()
+    if "To the Moon!" in result["gecko_says"]:
+      await message.channel.send("The server is up **to the moon** :rocket:")
+    else:
+      await message.channel.send("There's something going on :sweat_smile: Please try again later")
 
   #get pair price
   if msg.startswith("$vs"):
