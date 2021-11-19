@@ -26,7 +26,6 @@ def get_favourites(favourites, pair):
       coin_price = get_coin(coin, pair)
       favourite_prices.append([coin, coin_price])
   return favourite_prices
-
 @client.event
 async def on_ready():
   print('We have logged in as {0.user}'.format(client))
@@ -38,25 +37,37 @@ async def on_message(message):
     return
 
   msg = message.content
-  
-  #get price
+  #Get status of the cg API
+  if msg.startswith("$status"):
+    print(cg.ping())
 
-  # if msg.startswith("$")
-
+  #get pair price
   if msg.startswith("$vs"):
-    value = msg.split("$vs ", 1)[1]
-    [token, vs_currencies] = value.split()
-    price = get_coin(token, vs_currencies)
-    await message.channel.send("Current {} price is {} {}".format(token, price, vs_currencies))
-  
+    try: #Check if the message has more than one word
+      value = msg.split("$vs ", 1)[1]
+      [token, vs_currencies] = value.split()
+      try:
+        price = get_coin(ids=token, vs_currencies=vs_currencies)
+        print(price)
+        await message.channel.send("Current {} price is {} {}".format(token, price, vs_currencies))
+      except:
+        await message.channel.send("There was a problem getting the pair price :face_with_spiral_eyes: Verify the availability and spelling of the coin id you used.\nTo see a coin id reffer to coingecko.com and look for the coin or use **$get_id + token_contract**")
+
+    except:
+      await message.channel.send("Remember to write the coin id you want to get the price off and the pair! Eg: \n$vs bitcoin usd :thumbsup:\n$vs bitcoin :x:")
+     
   #Get favourites price
   if msg.startswith("$fav"):
-    value = msg.split("$fav ", 1)[1]
-
-    favourite_values = get_favourites(favourites, value)
-    for favourite_value in favourite_values:
-      await message.channel.send("Current {} price is {} {}".format(favourite_value[0], favourite_value[1], value))
-
+    try:
+      value = msg.split("$fav ", 1)[1]
+      try:
+        favourite_values = get_favourites(favourites, value)
+        for favourite_value in favourite_values:
+          await message.channel.send("Current {} price is {} {}".format(favourite_value[0], favourite_value[1], value))
+      except:
+        await message.channel.send("There has been a problem fetching the servers favourites :skull: Try: \n-Check your internet conection :white_check_mark:  \n-Use **$status** to check the coingecko API status :white_check_mark: \n-Try again")   
+    except:
+      await message.channel.send("Make sure to include the currency pair :sweat_smile: Eg: \n\n$fav usd :+1:\n \n$fav :x:")
   #Turn on or of
   if msg.startswith("$trady"):
     value = msg.split("$trady ", 1)[1]
